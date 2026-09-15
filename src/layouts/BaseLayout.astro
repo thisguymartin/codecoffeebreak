@@ -7,6 +7,8 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
   article?: {
     publishedAt: Date;
     updatedAt?: Date;
@@ -16,10 +18,10 @@ interface Props {
     topics: string[];
   };
 }
-const { title, description = site.description, image, article } = Astro.props;
+const { title, description = site.description, image, imageAlt, noindex = false, article } = Astro.props;
 const fullTitle = title
   ? `${title} · ${site.name}`
-  : `${site.name} · A quiet corner for developers`;
+  : `Phoenix Developer & AI Meetups · ${site.name}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const imageUrl = image ? new URL(image, Astro.site).href : undefined;
 const analytics = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
@@ -45,6 +47,8 @@ const schema = article
       '@type': 'WebSite',
       name: site.name,
       url: site.url,
+      description: site.description,
+      inLanguage: 'en-US',
     };
 ---
 
@@ -55,8 +59,10 @@ const schema = article
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {(noindex || import.meta.env.DEV) && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
-    <meta property="og:title" content={title ?? site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content={article ? 'article' : 'website'} />
@@ -65,12 +71,14 @@ const schema = article
       name="twitter:card"
       content={imageUrl ? 'summary_large_image' : 'summary'}
     />
-    <meta name="twitter:title" content={title ?? site.name} />
+    <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     {imageUrl && (
       <>
         <meta property="og:image" content={imageUrl} />
         <meta name="twitter:image" content={imageUrl} />
+        {imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+        {imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
       </>
     )}
     {article && (
@@ -89,13 +97,8 @@ const schema = article
         ))}
       </>
     )}
-    <meta name="theme-color" content="#211d19" />
-    <link
-      rel="icon"
-      href="/favicon.png?v=lofi"
-      type="image/png"
-      sizes="96x96"
-    />
+    <meta name="theme-color" content="#211914" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link
       rel="apple-touch-icon"
       href="/apple-touch-icon.png?v=lofi"
@@ -152,7 +155,7 @@ const schema = article
     <header class="site-header wrap">
       <a class="brand" href="/" aria-label="Code Coffee Break home">
         <span class="brand-mark">
-          <CoffeeMark size={40} />
+          <CoffeeMark size={32} />
         </span>
         <span>Code Coffee Break</span>
       </a>
@@ -187,6 +190,7 @@ const schema = article
       </div>
     </header>
     <main id="main">
+      {import.meta.env.DEV && <aside class="wrap editorial-disclosure">Local preview mode. <a href="/articles">Blog drafts</a> are visible here, but excluded from production builds and RSS.</aside>}
       <slot />
     </main>
     <footer class="site-footer wrap">
@@ -194,11 +198,11 @@ const schema = article
         <a class="footer-brand" href="/">
           Code Coffee Break
         </a>
-        <p>Short reads. Useful tools. Room for another developer.</p>
+        <p>Developer meetups in Phoenix, Arizona.</p>
       </div>
       <div class="footer-links">
         <a href="/about">About</a>
-        <a href="/contribute">Write</a>
+        <a href="/contribute">Writing guide</a>
         <a href="/topics">Topics</a>
         <a href="/rss.xml">
           <Icon name="rss" size={14} /> RSS
@@ -206,7 +210,7 @@ const schema = article
       </div>
       <p class="footer-note">
         © {new Date().getFullYear()} {site.name}
-        <span>Take your time. Make something good.</span>
+        <span>Learn and build with other developers.</span>
       </p>
     </footer>
     <script>
@@ -222,8 +226,8 @@ const schema = article
         if (meta)
           meta.content =
             document.documentElement.dataset.theme === 'dark'
-              ? '#211d19'
-              : '#f8f3e9';
+              ? '#211914'
+              : '#faf3e9';
       }
       updateThemeLabel();
       toggle?.addEventListener('click', () => {

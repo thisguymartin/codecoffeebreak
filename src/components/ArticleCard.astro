@@ -12,6 +12,8 @@ const Heading = level === 2 ? 'h2' : 'h3';
 <article class="article-row">
   <div class="article-row-content">
     <div class="article-row-meta">
+      {article.data.draft && <strong class="type-label">Draft</strong>}
+      {!article.data.draft && article.data.publishedAt > new Date() && <strong class="type-label">Scheduled</strong>}
       <span class="type-label">{typeLabel(article.data.type)}</span>
       <span>·</span>
       <span>{readingTime(article.body)} min read</span>

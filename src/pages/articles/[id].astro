@@ -2,21 +2,21 @@
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
-  publishedArticles,
+  articlesForDisplay,
   readingTime,
   dateLabel,
   typeLabel,
   topicSlug,
 } from '../../utils/content';
 export async function getStaticPaths() {
-  return (await publishedArticles()).map((article) => ({
+  return (await articlesForDisplay()).map((article) => ({
     params: { id: article.id },
     props: { article },
   }));
 }
 const { article } = Astro.props;
 const { Content, headings } = await render(article);
-const related = (await publishedArticles())
+const related = (await articlesForDisplay())
   .filter(
     (other) =>
       other.id !== article.id &&
@@ -33,6 +33,8 @@ const related = (await publishedArticles())
 >
   <div class="wrap">
     <header class="page-heading article-heading">
+      {article.data.draft && <p class="editorial-disclosure">Draft · Local preview only. This post will not be published.</p>}
+      {!article.data.draft && article.data.publishedAt > new Date() && <p class="editorial-disclosure">Scheduled · Local preview only. Publish with a new build on or after the publication date.</p>}
       <div class="breadcrumb">
         <a href="/articles">The notebook</a>
         <span>/</span>

@@ -16,6 +16,8 @@ async function files(directory) {
 }
 const allFiles = await files('dist');
 const pages = allFiles.filter((file) => file.endsWith('.html'));
+const sitemap = await readFile('dist/sitemap-0.xml', 'utf8');
+const sitemapUrls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
 const titles = new Set();
 let checkedLinks = 0;
 for (const page of pages) {
@@ -36,6 +38,15 @@ for (const page of pages) {
   );
   assert.equal((html.match(/<h1[\s>]/g) ?? []).length, 1, `One h1 in ${page}`);
   assert.ok(html.includes('rel="canonical"'), `Canonical exists in ${page}`);
+  const canonical = html.match(/<link[^>]*rel="canonical"[^>]*href="([^"]+)"/)?.[1];
+  assert.ok(canonical?.startsWith('https://codecoffeebreak.com/'), `Production canonical in ${page}`);
+  if (page === 'dist/404.html') {
+    assert.ok(html.includes('name="robots" content="noindex"'), '404 is not indexable');
+    assert.ok(!sitemapUrls.includes(canonical), '404 excluded from sitemap');
+  } else {
+    assert.ok(!html.includes('content="noindex"'), `Public page stays indexable in ${page}`);
+    assert.ok(sitemapUrls.includes(canonical), `Canonical matches sitemap in ${page}`);
+  }
   for (const match of html.matchAll(
     /(?:href|src)="(\/[^"?#]*)(?:[?#][^"]*)?"/g,
   )) {
@@ -58,7 +69,14 @@ for (const page of pages) {
     checkedLinks++;
   }
 }
+const homepage = await readFile('dist/index.html', 'utf8');
+assert.match(homepage, /<title>Phoenix Developer &amp; AI Meetups/);
+assert.ok(homepage.includes('Developer meetups in Phoenix, Arizona.'), 'Visible local meetup positioning');
+assert.match(homepage, /property="og:image" content="https:\/\//);
+assert.ok(homepage.includes('name="twitter:card" content="summary_large_image"'), 'Homepage large image preview');
+assert.ok(!homepage.includes('"@type":"Event"'), 'Unconfirmed gathering has no Event markup');
 for (const slug of [
+  'welcome-draft',
   'building-my-first-sekiro-mod',
   'lambda-cache-warmer',
   'repository-context-experiment',
@@ -71,6 +89,10 @@ for (const slug of [
     !(await readFile('dist/rss.xml', 'utf8')).includes(slug),
     `Draft ${slug} excluded from RSS`,
   );
+  assert.ok(!sitemap.includes(slug), `Draft ${slug} excluded from sitemap`);
+  for (const page of pages) {
+    assert.ok(!(await readFile(page, 'utf8')).includes(`/articles/${slug}`), `Draft link excluded from ${page}`);
+  }
 }
 const article = await readFile(
   'dist/articles/the-cost-of-repeated-context/index.html',

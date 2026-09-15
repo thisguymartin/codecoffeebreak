@@ -23,10 +23,16 @@ export const typeLabel = (type: CollectionEntry<'articles'>['data']['type']) =>
     'quick-break': 'Quick break',
   })[type];
 export async function publishedArticles() {
+  return articlesForDisplay({ preview: false });
+}
+
+export async function articlesForDisplay({ preview = import.meta.env.DEV } = {}) {
   return (
     await getCollection(
       'articles',
-      ({ data }) => !data.draft && data.publishedAt <= new Date(),
+      ({ data }) =>
+        (import.meta.env.DEV && preview) ||
+        (!data.draft && data.publishedAt <= new Date()),
     )
   ).sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 }

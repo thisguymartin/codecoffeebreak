@@ -6,30 +6,30 @@
 web
 
 ## Stack
-Astro, TypeScript, pnpm, Markdown Content Collections. Static output. Existing Cloudflare static-assets configuration remains; no new deployment target or account is selected.
+Astro, TypeScript, pnpm, Markdown collections, static output. Retain the existing deployment configuration.
 
 ## Users
-Curious developers taking a short break, reading a concrete software lesson, or trying a small useful tool.
+Developers who want to meet in person, learn about AI agents and coding workflows, work on projects, and help each other.
 
-## Product Purpose
-A relaxed developer reading room independent of the owner's personal portfolio. Publish original, understandable examples of everyday software behavior. Make space for future contributors without claiming a community already exists.
+## Product purpose
+An event and community website for small developer meetups over coffee. Events lead the experience. Learning resources and browser tools support the gatherings.
 
-## Capabilities and Constraints
-Articles, topic archives, browser-local calculator, contribution guide, about, RSS, sitemap, metadata, light/dark themes. One slow coffee-steam motif with explicit pause, reduced-motion, offscreen, and hidden-tab handling. No accounts, database, comments, chat, audio stream, or coffee store. Submissions are not yet open.
+## Brand commitments
+Keep the small pause-cup logo, self-hosted Geist, warm cream and espresso themes with caramel accents, readable typography, and simple layouts. Avoid oversized slogans, floating illustrations, invented testimonials, and ornamental timelines.
 
-## Brand Commitments
-Code Coffee Break. Warm cream in daylight, espresso at night. Self-hosted Geist, readable editorial rows, a hand-painted sage ceramic mug and separate steam animation. The owner requested a lo-fi Studio Ghibli-inspired icon on 2026-09-14. This focused generated brand asset replaces the rejected geometric mark; no generated article covers. No personal biography or personal project promotion. The user explicitly rejected using their portfolio as content context on 2026-09-14.
+## Capabilities and constraints
+The first gathering is in planning. No date, location, venue, price, attendance count, or registration destination is confirmed. Display that status plainly. A proposed 90-minute format includes introductions, working together, and sharing progress. Resources, topic archives, calculator, contribution guide, RSS, themes, and metadata remain available.
 
-## Content Truth
-Three original AI-assisted educational articles cover ambiguous timeouts, cache stampedes, and CLI output. Each discloses authorship, uses fictional scenarios, and links primary sources. The existing calculator explainer uses illustrative rates. Personal project summaries and experience outlines are archived outside the public collections. No invented production incidents, benchmarks, memberships, or career outcomes.
+## Content truth
+Four existing AI-assisted articles and one browser-local calculator support learning between meetups. Preserve their disclosures and illustrative assumptions. Do not present these as a complete agent curriculum.
 
-## Product Principles
-- Articles serve the reader independently of the maintainer's identity.
-- Short examples earn attention through specificity.
-- Markdown and static delivery keep management simple.
-- Browser-tool inputs stay local.
-- Guest bylines identify actual contributors. Editorial organization attribution must not impersonate a person.
-- Coffee is the atmosphere. Revenue features follow actual reader demand.
+## Product principles
+- Visitors immediately understand this is an in-person developer meetup.
+- Event status and participation expectations precede resources.
+- AI agents, coding workflows, and side projects are meetup subjects.
+- Beginners can attend without a finished project.
+- Registration appears only when a real event and destination exist.
+- Do not pivot into a publication or resource directory without an explicit user request.
 
-## Open Decisions
-A real contribution destination, production domain/account connection, optional analytics, and whether recurring discussions are useful. None is simulated in the interface.
+## Open decisions
+First date and venue, registration destination, cost, contact channel, and production deployment.
