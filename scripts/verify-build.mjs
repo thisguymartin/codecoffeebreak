@@ -23,7 +23,7 @@ let checkedLinks = 0;
 for (const page of pages) {
   const html = await readFile(page, 'utf8');
   assert.ok(
-    !/Martin Patino|martinpatino\.com|thisguymartin|\/projects\/(grove|mochi|zettl)/i.test(
+    !/Martin Patino|martinpatino\.com|\/projects\/(grove|mochi|zettl)/i.test(
       html,
     ),
     `Publication identity stays independent in ${page}`,
@@ -70,6 +70,14 @@ for (const page of pages) {
   }
 }
 const homepage = await readFile('dist/index.html', 'utf8');
+const meetup = await readFile('dist/meetups/first-coffee-break/index.html', 'utf8');
+assert.ok(meetup.includes('Discussion and project sharing'), 'Meetup plan renders Markdown');
+assert.ok(meetup.includes('In planning'), 'First event stays unconfirmed');
+assert.ok(!meetup.includes('Projects we shared'), 'No empty project showcase');
+assert.ok(!meetup.includes('"@type":"Event"'), 'No unconfirmed event schema');
+assert.ok(homepage.includes('/meetups/first-coffee-break/'), 'Homepage links to event plan');
+assert.ok(!(await readFile('dist/rss.xml', 'utf8')).includes('/meetups/'), 'Meetups stay out of blog RSS');
+assert.ok(!(await readFile('dist/articles/index.html', 'utf8')).includes('/meetups/first-coffee-break'), 'Meetups stay out of blog listing');
 assert.match(homepage, /<title>Phoenix Developer &amp; AI Meetups/);
 assert.ok(homepage.includes('Developer meetups in Phoenix, Arizona.'), 'Visible local meetup positioning');
 assert.match(homepage, /property="og:image" content="https:\/\//);

@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const meetups = await getCollection(
+  'meetups',
+  ({ data }) => import.meta.env.DEV || !data.draft,
+);
+const upcoming = meetups.filter(({ data }) => data.status !== 'completed');
+const past = meetups
+  .filter(({ data }) => data.status === 'completed')
+  .sort(
+    (a, b) =>
+      ('startsAt' in b.data ? Date.parse(b.data.startsAt) : 0) -
+      ('startsAt' in a.data ? Date.parse(a.data.startsAt) : 0),
+  );
+const groups = [
+  { title: 'Coming up', entries: upcoming },
+  { title: 'Past meetups & recaps', entries: past },
+];
+---
+
+<BaseLayout
+  title="Phoenix meetups & recaps"
+  description="Find upcoming Code Coffee Break meetups in Phoenix and revisit the discussions, useful links, and projects shared at past gatherings."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>Meetups &amp; recaps</h1>
+      <p>
+        Come for a coffee. Leave with an idea, a useful connection, or something
+        to try.
+      </p>
+    </header>
+    <div class="page-body">
+      {groups.map(
+        (group) =>
+          group.entries.length > 0 && (
+            <section class="meetup-group">
+              <h2>{group.title}</h2>
+              {group.entries.map(({ id, data }) => (
+                <article class="article-row">
+                  <div class="article-row-content">
+                    <p class="article-row-meta">
+                      {data.draft ? 'Draft · ' : ''}
+                      {data.status === 'planning' ? (
+                        'In planning'
+                      ) : (
+                        <time datetime={data.startsAt}>
+                          {new Date(data.startsAt).toLocaleDateString('en-US', {
+                            timeZone: 'America/Phoenix',
+                            dateStyle: 'long',
+                          })}
+                        </time>
+                      )}{' '}
+                      · {data.city}
+                    </p>
+                    <h3>
+                      <a href={`/meetups/${id}/`}>{data.title}</a>
+                    </h3>
+                    <p>{data.description}</p>
+                    <a class="text-link" href={`/meetups/${id}/`}>
+                      {data.status === 'completed'
+                        ? 'Read the recap'
+                        : 'See the meetup plan'}{' '}
+                      ↗
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </section>
+          ),
+      )}
+      <p class="editorial-note">
+        Looking for standalone articles? <a href="/articles">Read the blog.</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>

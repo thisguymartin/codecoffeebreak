@@ -491,6 +491,18 @@ input[type='range'] {
 .article-row .row-arrow {
   display: none;
 }
+.meetup-group + .meetup-group { margin-top: 48px; }
+.meetup-detail { display: grid; gap: 40px; }
+.meetup-facts { background: var(--paper); padding: 24px; }
+.meetup-facts dl { margin: 0 0 20px; }
+.meetup-facts dl div { display: grid; grid-template-columns: 80px 1fr; gap: 16px; margin-bottom: 12px; }
+.meetup-facts dt { color: var(--muted); }
+.meetup-facts dd { margin: 0; overflow-wrap: anywhere; }
+.meetup-submit { border-top: 1px solid var(--line); padding-top: 28px; max-width: 70ch; }
+.meetup-submit p { margin-block: 12px; }
+.shared-project { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 24px; }
+.shared-project img { width: 100%; height: auto; }
+.shared-project-links { display: flex; gap: 24px; flex-wrap: wrap; }
 .editorial-note {
   color: var(--muted);
   font-size: 11px;

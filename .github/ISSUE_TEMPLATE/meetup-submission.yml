@@ -1,0 +1,75 @@
+name: Meetup discussion or project
+description: Suggest a topic or share a project for a specific Code Coffee Break meetup.
+title: '[Meetup] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a public submission, not an RSVP. We review submissions before adding them to an event page. Do not post contact details, secrets, customer data, or other people's photos without permission.
+  - type: input
+    id: meetup
+    attributes:
+      label: Meetup page
+      description: Paste the event page URL so we attach your submission to the right gathering.
+    validations:
+      required: true
+  - type: input
+    id: meeting-date
+    attributes:
+      label: Meeting date
+      description: Use YYYY-MM-DD, or write TBD if the date is not confirmed.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What are you sharing?
+      options:
+        - Discussion topic
+        - Discussion notes or useful links
+        - Project showcase
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Topic, notes, or project summary
+      description: What should we discuss, what did you learn, or what does your project do? Include a project name if relevant.
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Display name or handle for credit
+      description: Use a public name or handle, not your email address.
+    validations:
+      required: true
+  - type: input
+    id: creator-url
+    attributes:
+      label: Public profile or website
+      description: Optional link to use with your credit.
+  - type: input
+    id: github
+    attributes:
+      label: GitHub repository
+      description: Optional public repository for your project.
+  - type: input
+    id: demo
+    attributes:
+      label: Demo URL
+      description: Optional public demo.
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or supporting links
+      description: Optional. Only attach media you have permission to share publicly. Include a short image description.
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Publication permission
+      options:
+        - label: I understand this issue is public and give permission to summarize this submission and publish the supplied project details, links, media, and credit on the meetup page.
+          required: true
+        - label: I own the submitted material or have permission to share it, including permission from identifiable people in any photos.
+          required: true

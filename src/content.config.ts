@@ -2,6 +2,7 @@ import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 import { site } from './config/site';
+import { meetupSchema } from './utils/meetup-schema';
 
 const common = z.object({
   title: z.string(),
@@ -57,4 +58,8 @@ const projects = defineCollection({
     articles: z.array(z.string()).default([]),
   }),
 });
-export const collections = { articles, tools, projects };
+const meetups = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/meetups' }),
+  schema: meetupSchema,
+});
+export const collections = { articles, tools, projects, meetups };
