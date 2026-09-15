@@ -4,7 +4,7 @@
 The homepage is an event website. A brief invitation leads to the first gathering's announcement, proposed format, topics, and supporting resources. The shared navigation leads with Meetups.
 
 ## Appearance
-Use warm cream backgrounds, latte-tinted panels, espresso text, and a roasted caramel accent. Dark mode uses deep espresso surfaces with cream text and lighter caramel accents. Keep self-hosted Geist, the small pause-cup mark, and the current light/dark preference. Use readable paragraphs, thin dividing rules, and no decorative hero animation.
+Use cream backgrounds, pale green panels, deep teal text and actions, and restrained terracotta details. Dark mode uses deep teal surfaces with cream text and mint accents. Photography shows real café spaces, credited and labeled as inspiration until a venue is confirmed. Keep self-hosted Geist, the small pause-cup mark, and the current light/dark preference. Use readable paragraphs, thin dividing rules, and no decorative hero animation.
 
 ## Layout
 The content wrapper is at most 1080px. The event announcement uses a main details column and a preparation note. The format uses a short introduction beside a simple duration list. At 700px these become single columns. No absolutely positioned content or fixed content heights.

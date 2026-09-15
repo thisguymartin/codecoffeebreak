@@ -15,7 +15,7 @@ Developers who want to meet in person, learn about AI agents and coding workflow
 An event and community website for small developer meetups over coffee. Events lead the experience. Learning resources and browser tools support the gatherings.
 
 ## Brand commitments
-Keep the small pause-cup logo, self-hosted Geist, warm cream and espresso themes with caramel accents, readable typography, and simple layouts. Avoid oversized slogans, floating illustrations, invented testimonials, and ornamental timelines.
+Keep the small pause-cup logo, self-hosted Geist, cream and deep teal themes with restrained terracotta details, readable typography, and simple layouts. Avoid oversized slogans, floating illustrations, invented testimonials, and ornamental timelines.
 
 ## Capabilities and constraints
 The first gathering is in planning. No date, location, venue, price, attendance count, or registration destination is confirmed. Display that status plainly. A proposed 90-minute format includes introductions, working together, and sharing progress. Resources, topic archives, calculator, contribution guide, RSS, themes, and metadata remain available.
