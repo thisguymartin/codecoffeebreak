@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.env.*
+!.env.example
+.DS_Store
+.impeccable/
+docs/assets/workbench-source.png
+docs/assets/context-source.png
+docs/retired-visuals/
+docs/archived-personal/

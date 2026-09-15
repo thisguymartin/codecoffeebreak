@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import Icon from '../../components/Icon.astro';
+import { publishedArticles } from '../../utils/content';
+const articles = await publishedArticles();
+---
+
+<BaseLayout
+  title="Articles"
+  description="Practical engineering articles about infrastructure, developer tools, AI coding workflows, and the decisions behind the work."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>The reading shelf</h1>
+      <p>
+        A short pause and one useful idea. Everyday software problems, explained
+        with examples you can follow.
+      </p>
+    </header>
+    <div class="page-body">
+      <div class="section-heading">
+        <p>
+          {articles.length} published{' '}
+          {articles.length === 1 ? 'article' : 'articles'}
+        </p>
+        <a class="text-link" href="/topics">
+          Browse topics <Icon name="arrow" size={13} />
+        </a>
+      </div>
+      <div class="article-list">
+        {articles.map((article) => (
+          <ArticleCard article={article} level={2} />
+        ))}
+      </div>
+      <p class="editorial-note">
+        Have a useful engineering story?{' '}
+        <a href="/contribute">Read the contribution guide.</a>
+      </p>
+      <Newsletter />
+    </div>
+  </div>
+</BaseLayout>

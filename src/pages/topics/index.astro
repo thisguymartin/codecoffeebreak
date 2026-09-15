@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../config/site';
+import { publishedArticles, topicSlug } from '../../utils/content';
+import { getCollection } from 'astro:content';
+const articles = await publishedArticles();
+const tools = await getCollection('tools', ({ data }) => !data.draft);
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+const topics = [
+  ...new Set([
+    ...site.topics,
+    ...articles.flatMap((a) => a.data.topics),
+    ...tools.flatMap((t) => t.data.topics),
+    ...projects.flatMap((p) => p.data.topics),
+  ]),
+].sort();
+---
+
+<BaseLayout
+  title="Topics"
+  description="Follow a thread through the Code Coffee Break engineering notebook."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>
+        Follow a thread<span class="brand-period">.</span>
+      </h1>
+      <p>
+        A few corners of software worth exploring. Find articles, tools, and
+        projects by the problems they touch.
+      </p>
+    </header>
+    <div class="page-body topic-directory">
+      {topics.map((topic) => (
+        <a href={`/topics/${topicSlug(topic)}`}>
+          <strong>{topic}</strong>
+          <span>
+            {articles.filter((a) => a.data.topics.includes(topic)).length}{' '}
+            articles ↗
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

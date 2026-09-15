@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout
+  title="Write for Code Coffee Break"
+  description="A contribution guide for practical engineering articles: real problems, clear decisions, useful code, and evidence."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>Share something useful.</h1>
+      <p>
+        A problem you solved, an experiment you ran, or a tool you built. Give
+        another developer something they can use.
+      </p>
+      <a class="text-link" href="/templates/article.md" download>
+        Download the draft template <Icon name="arrow" size={13} />
+      </a>
+    </header>
+    <article class="page-body prose">
+      <h2>What fits here</h2>
+      <p>
+        Debugging stories, architecture decisions, hands-on tutorials, build
+        logs, and measured experiments. Pick one concrete problem and explain
+        what made it interesting.
+      </p>
+      <h2>Show your work</h2>
+      <p>
+        Include enough context for someone else to follow: the constraints, the
+        approach, what worked, and what you would change. Code should be
+        runnable or clearly marked as a shortened example. Measurements need a
+        method and units.
+      </p>
+      <p>
+        Use public or synthetic examples. Link sources for external claims,
+        credit collaborators, and distinguish observed results from estimates.
+        Keep customer data and employer-confidential details out of the draft.
+      </p>
+      <h2>Keep your own voice</h2>
+      <p>
+        Write like you are explaining it to a colleague. A short, specific
+        article is welcome. Your name stays on your work. Disclose AI assistance
+        and label illustrative examples.
+      </p>
+      <h2>Preparing a contribution</h2>
+      <p>
+        The template is Markdown. Replace the prompts, add your author name and
+        a useful summary, then keep it in draft until the examples and
+        conclusions are ready.
+      </p>
+      <h2>Submissions</h2>
+      <p>
+        Community submissions are not open yet. The contribution guide and
+        template are available now; a submission destination will be linked here
+        when it is ready.
+      </p>
+      <p>
+        In the meantime, <a href="/articles">read the articles</a>,{' '}
+        <a href="/tools">try a tool</a>, or{' '}
+        <a href="/rss.xml">follow new writing via RSS</a>.
+      </p>
+    </article>
+  </div>
+</BaseLayout>

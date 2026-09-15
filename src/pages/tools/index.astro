@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import { getCollection } from 'astro:content';
+const tools = await getCollection('tools', ({ data }) => !data.draft);
+---
+
+<BaseLayout
+  title="Developer tools"
+  description="Useful browser-only developer tools. Start with the AI Context Cost Calculator."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>Small developer tools</h1>
+      <p>
+        Get a useful estimate or test an idea. No account or setup, and your
+        inputs stay in your browser.
+      </p>
+    </header>
+    <div class="page-body">
+      {tools.map((tool) => (
+        <ToolCard tool={tool} />
+      ))}
+      <p class="editorial-note">
+        The first tool is ready. More when a real engineering problem calls for
+        one.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

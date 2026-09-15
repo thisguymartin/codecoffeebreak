@@ -1,0 +1,28 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+interface Props {
+  project: CollectionEntry<'projects'>;
+  level?: 2 | 3;
+}
+const { project, level = 3 } = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
+---
+
+<article class="project-row">
+  <div>
+    <Heading>
+      <a href={`/projects/${project.id}`}>{project.data.title}</a>
+      <span class="project-status">{project.data.status}</span>
+    </Heading>
+    <p>{project.data.description}</p>
+    <div class="tech-list">{project.data.technologies.join(' · ')}</div>
+  </div>
+  <a
+    class="text-link"
+    href={`/projects/${project.id}`}
+    aria-label={`${project.data.title} details`}
+  >
+    Details <Icon name="arrow" size={13} />
+  </a>
+</article>

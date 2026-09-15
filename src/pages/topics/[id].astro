@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../config/site';
+import ArticleCard from '../../components/ArticleCard.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { publishedArticles, topicSlug } from '../../utils/content';
+export async function getStaticPaths() {
+  const entries = [
+    ...(await publishedArticles()),
+    ...(await getCollection('tools', ({ data }) => !data.draft)),
+    ...(await getCollection('projects', ({ data }) => !data.draft)),
+  ];
+  const topics = [
+    ...new Set([
+      ...site.topics,
+      ...entries.flatMap((entry) => entry.data.topics),
+    ]),
+  ];
+  return topics.map((topic) => ({
+    params: { id: topicSlug(topic) },
+    props: { topic },
+  }));
+}
+const { topic } = Astro.props;
+const articles = (await publishedArticles()).filter((article) =>
+  article.data.topics.includes(topic),
+);
+const tools = (await getCollection('tools', ({ data }) => !data.draft)).filter(
+  (tool) => tool.data.topics.includes(topic),
+);
+const projects = (
+  await getCollection('projects', ({ data }) => !data.draft)
+).filter((project) => project.data.topics.includes(topic));
+---
+
+<BaseLayout
+  title={topic}
+  description={`Articles, tools, and projects about ${topic}.`}
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <div class="breadcrumb">
+        <a href="/topics">Topics</a>
+        <span>/</span>
+        <span>{topic}</span>
+      </div>
+      <h1>
+        {topic}
+        <span class="brand-period">.</span>
+      </h1>
+    </header>
+    <div class="page-body">
+      {articles.length > 0 && (
+        <section>
+          <h2>From the notebook</h2>
+          {articles.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </section>
+      )}
+      {tools.length > 0 && (
+        <section class="content-section">
+          <h2 class="topic-section-title">On the workbench</h2>
+          {tools.map((tool) => (
+            <ToolCard tool={tool} />
+          ))}
+        </section>
+      )}
+      {projects.length > 0 && (
+        <section class="content-section">
+          <h2 class="topic-section-title">Projects</h2>
+          {projects.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </section>
+      )}
+      {articles.length + tools.length + projects.length === 0 && (
+        <div class="empty-state">
+          <h2>This thread is still brewing.</h2>
+          <p>
+            Nothing published here yet. New notes join when there’s a worthwhile
+            problem to share.
+          </p>
+          <p>
+            <a class="text-link" href="/articles">
+              Read the notebook ↗
+            </a>
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

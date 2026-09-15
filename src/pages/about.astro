@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Newsletter from '../components/Newsletter.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="A relaxed developer publication about everyday software problems, small experiments, and useful tools."
+>
+  <div class="wrap">
+    <header class="page-heading">
+      <h1>A quiet corner for curious developers.</h1>
+      <p>Something useful to read while your coffee cools.</p>
+    </header>
+    <div class="page-body">
+      <article class="prose">
+        <h2>One idea at a time</h2>
+        <p>
+          Code Coffee Break explores the small decisions inside software. What
+          does a timeout tell you? Why do cache misses arrive together? What
+          makes a command pleasant to use?
+        </p>
+        <p>
+          A good read leaves you with an example you can explain, a question to
+          take back to your code, or a tool that helps you work something out.
+        </p>
+        <h2>Examples you can inspect</h2>
+        <p>
+          The opening articles are original, AI-assisted editorial pieces. They
+          use fictional scenarios, source links, and runnable examples where
+          appropriate. They are not accounts of personal projects or production
+          incidents. Each article identifies its authorship and any illustrative
+          data.
+        </p>
+        <p>
+          Future contributors keep their own bylines. Measurements need a
+          method; external claims need a source. Corrections should explain what
+          changed.
+        </p>
+        <h2>Room for other voices</h2>
+        <p>
+          This begins as a small reading room. The{' '}
+          <a href="/contribute">contribution guide</a> is ready; submissions are
+          not open yet. There are no invented members, event schedules, or
+          audience numbers.
+        </p>
+        <h2>Keep it simple</h2>
+        <p>
+          Read without an account. Try the <a href="/tools">browser tools</a>{' '}
+          without uploading your inputs. Follow new writing through{' '}
+          <a href="/rss.xml">RSS</a>. Coffee is the atmosphere, and there is no
+          shop to browse.
+        </p>
+      </article>
+      <Newsletter />
+    </div>
+  </div>
+</BaseLayout>

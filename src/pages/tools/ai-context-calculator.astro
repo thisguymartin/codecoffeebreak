@@ -1,0 +1,721 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { exampleWorkload } from '../../utils/calculator';
+const fields = [
+  {
+    name: 'inputRate',
+    label: 'Input price',
+    unit: '$ / million tokens',
+    value: exampleWorkload.inputRate,
+    step: '0.01',
+  },
+  {
+    name: 'outputRate',
+    label: 'Output price',
+    unit: '$ / million tokens',
+    value: exampleWorkload.outputRate,
+    step: '0.01',
+  },
+  {
+    name: 'systemTokens',
+    label: 'System prompt',
+    unit: 'tokens / call',
+    value: exampleWorkload.systemTokens,
+    step: '1',
+  },
+  {
+    name: 'repositoryTokens',
+    label: 'Whole repository',
+    unit: 'tokens / call',
+    value: exampleWorkload.repositoryTokens,
+    step: '1',
+  },
+  {
+    name: 'taskInputTokens',
+    label: 'Task input',
+    unit: 'tokens / call',
+    value: exampleWorkload.taskInputTokens,
+    step: '1',
+  },
+  {
+    name: 'outputTokens',
+    label: 'Average output',
+    unit: 'tokens / call',
+    value: exampleWorkload.outputTokens,
+    step: '1',
+  },
+  {
+    name: 'callsPerTask',
+    label: 'Calls per task',
+    unit: 'model calls',
+    value: exampleWorkload.callsPerTask,
+    step: '1',
+  },
+  {
+    name: 'tasksPerDay',
+    label: 'Tasks per day',
+    unit: 'tasks',
+    value: exampleWorkload.tasksPerDay,
+    step: '1',
+  },
+];
+---
+
+<BaseLayout
+  title="AI Context Cost Calculator"
+  description="Compare whole-repository and targeted AI context. Estimate tokens and cost per task, day, and month, entirely in your browser."
+>
+  <div class="wrap">
+    <header class="page-heading tool-heading">
+      <div class="breadcrumb">
+        <a href="/tools">The workbench</a>
+        <span>/</span>
+        <span>AI Engineering</span>
+      </div>
+      <h1>AI Context Cost Calculator</h1>
+      <p>
+        Compare whole-repository and targeted context. Estimate tokens and cost
+        across the model calls in your workflow.
+      </p>
+      <span class="local-badge">
+        <span class="status-dot" aria-hidden="true"></span> Runs entirely in
+        your browser. Your data is not uploaded.
+      </span>
+    </header>
+    <div class="page-body">
+      <noscript>
+        <aside class="callout">
+          This calculator needs JavaScript to calculate locally. Enable it, then
+          reload. Your inputs are never uploaded.
+        </aside>
+      </noscript>
+      <div class="calculator-grid">
+        <form id="calculator-form" novalidate>
+          <div class="section-heading">
+            <h2>Your workload</h2>
+            <button type="reset" class="reset-button">
+              Reset example
+            </button>
+          </div>
+          <p class="input-note">
+            Example prices are illustrative. Enter your provider’s current USD
+            rates.
+          </p>
+          <div class="field-grid">
+            {fields.map((field) => (
+              <label class="field" for={field.name}>
+                <span>{field.label}</span>
+                <div class="number-wrap">
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    type="number"
+                    min={field.name === 'callsPerTask' ? 1 : 0}
+                    max="1000000000"
+                    step={field.step}
+                    value={field.value}
+                    required
+                  />
+                  <small>{field.unit}</small>
+                </div>
+              </label>
+            ))}
+          </div>
+          <fieldset class="target-context">
+            <legend>Targeted repository context</legend>
+            <div class="target-value">
+              <label for="targetedTokens">Context per call</label>
+              <div>
+                <input
+                  id="targetedTokens"
+                  name="targetedTokens"
+                  type="number"
+                  min="0"
+                  max="80000"
+                  step="1"
+                  value="8000"
+                  required
+                />
+                <span>tokens</span>
+              </div>
+            </div>
+            <label class="sr-only" for="context-slider">
+              Adjust targeted repository context
+            </label>
+            <input
+              id="context-slider"
+              type="range"
+              min="0"
+              max="80000"
+              step="100"
+              value="8000"
+            />
+            <div class="range-labels">
+              <span>No repository context</span>
+              <span>Whole repository</span>
+            </div>
+          </fieldset>
+          <p
+            id="calculator-error"
+            class="calculator-error"
+            role="alert"
+            hidden
+          ></p>
+        </form>
+        <section class="results" aria-label="Estimated context cost">
+          <h2>Cost comparison</h2>
+          <div
+            class="scenario-choice"
+            role="group"
+            aria-label="Show detailed estimate for"
+          >
+            <button type="button" data-scenario="full" aria-pressed="false">
+              Whole repository
+            </button>
+            <button type="button" data-scenario="targeted" aria-pressed="true">
+              Targeted context
+            </button>
+          </div>
+          <div
+            id="result-announcement"
+            class="sr-only"
+            aria-live="polite"
+            aria-atomic="true"
+          ></div>
+          <div class="monthly-total">
+            <span>Estimated monthly cost</span>
+            <output id="monthly-cost">$207.00</output>
+            <small>
+              USD · 30 days ·{' '}
+              <span id="selected-scenario">targeted context</span>
+            </small>
+          </div>
+          <div class="comparison-chart" aria-label="Monthly cost comparison">
+            <div class="chart-label">
+              <span>Whole repository</span>
+              <output id="full-monthly">$855.00</output>
+            </div>
+            <div class="cost-track">
+              <div
+                id="full-bar"
+                class="cost-bar whole"
+                style="width:100%"
+              ></div>
+            </div>
+            <div class="chart-label">
+              <span>Targeted context</span>
+              <output id="targeted-monthly">$207.00</output>
+            </div>
+            <div class="cost-track">
+              <div
+                id="targeted-bar"
+                class="cost-bar"
+                style="width:24.21%"
+              ></div>
+            </div>
+          </div>
+          <p class="savings">
+            <strong id="savings-cost">$648.00</strong> less per month{' '}
+            <span id="savings-percent">(75.8%)</span>
+          </p>
+          <dl class="result-details">
+            <div>
+              <dt>Cost / task</dt>
+              <dd id="task-cost">$0.345</dd>
+            </div>
+            <div>
+              <dt>Cost / day</dt>
+              <dd id="daily-cost">$6.90</dd>
+            </div>
+            <div>
+              <dt>Input tokens / task</dt>
+              <dd id="input-tokens">65,000</dd>
+            </div>
+            <div>
+              <dt>Output tokens / task</dt>
+              <dd id="output-tokens">10,000</dd>
+            </div>
+            <div>
+              <dt>Total tokens / task</dt>
+              <dd id="task-tokens">75,000</dd>
+            </div>
+            <div>
+              <dt>Total tokens / day</dt>
+              <dd id="daily-tokens">1,500,000</dd>
+            </div>
+            <div>
+              <dt>Total tokens / month</dt>
+              <dd id="monthly-tokens">45,000,000</dd>
+            </div>
+          </dl>
+          <p class="results-caption">
+            An estimate, not a bill. Smaller context doesn’t guarantee the same
+            answer quality.
+          </p>
+        </section>
+      </div>
+      <section class="calculator-method prose">
+        <h2>The math, without the mystery</h2>
+        <p>
+          Every call repeats system prompt + repository context + task input.
+          Output is counted separately. Multiply by calls per task, then tasks
+          per day. A month is 30 days.
+        </p>
+        <pre><code>Input / task = (system + context + task input) × calls
+Output / task = average output × calls
+Cost / task = (input × input price + output × output price) / 1,000,000</code></pre>
+        <p>
+          This simple model excludes prompt caching, conversation growth,
+          reasoning tokens, tool results, retries, and subscription allowances.
+          Enter all billable output in the output field and extra calls in calls
+          per task if you want to approximate them.
+        </p>
+        <p>
+          <a href="/articles/the-cost-of-repeated-context">
+            Read the notebook entry behind the calculator ↗
+          </a>
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+<script>
+  import {
+    compare,
+    validateWorkload,
+    type Comparison,
+  } from '../../utils/calculator';
+  const form = document.querySelector<HTMLFormElement>('#calculator-form');
+  const target = document.querySelector<HTMLInputElement>('#targetedTokens');
+  const repository =
+    document.querySelector<HTMLInputElement>('#repositoryTokens');
+  const slider = document.querySelector<HTMLInputElement>('#context-slider');
+  const error =
+    document.querySelector<HTMLParagraphElement>('#calculator-error');
+  const results = document.querySelector<HTMLElement>('.results');
+  const switches =
+    document.querySelectorAll<HTMLButtonElement>('[data-scenario]');
+  const money = (value: number, digits = 2) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(value);
+  const number = (value: number) =>
+    new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
+  let scenario: 'full' | 'targeted' = 'targeted';
+  let announcementTimer: ReturnType<typeof setTimeout>;
+  function text(id: string, value: string) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+  function renderResult(comparison: Comparison) {
+    const selected = comparison[scenario];
+    text('monthly-cost', money(selected.costPerMonth));
+    text(
+      'selected-scenario',
+      scenario === 'full' ? 'whole repository' : 'targeted context',
+    );
+    text('full-monthly', money(comparison.full.costPerMonth));
+    text('targeted-monthly', money(comparison.targeted.costPerMonth));
+    text('savings-cost', money(comparison.savings.costPerMonth));
+    text('savings-percent', `(${comparison.savings.percent.toFixed(1)}%)`);
+    text('task-cost', money(selected.costPerTask, 3));
+    text('daily-cost', money(selected.costPerDay));
+    text('input-tokens', number(selected.tokensPerTask.input));
+    text('output-tokens', number(selected.tokensPerTask.output));
+    text('task-tokens', number(selected.tokensPerTask.total));
+    text('daily-tokens', number(selected.tokensPerDay.total));
+    text('monthly-tokens', number(selected.tokensPerMonth.total));
+    const fullBar = document.querySelector<HTMLElement>('#full-bar');
+    const targetedBar = document.querySelector<HTMLElement>('#targeted-bar');
+    if (fullBar)
+      fullBar.style.width = comparison.full.costPerMonth === 0 ? '0%' : '100%';
+    if (targetedBar)
+      targetedBar.style.width = `${comparison.full.costPerMonth === 0 ? 0 : (comparison.targeted.costPerMonth / comparison.full.costPerMonth) * 100}%`;
+    clearTimeout(announcementTimer);
+    announcementTimer = setTimeout(
+      () =>
+        text(
+          'result-announcement',
+          `${scenario === 'full' ? 'Whole repository' : 'Targeted context'} costs an estimated ${money(selected.costPerMonth)} per month. Targeted context saves ${money(comparison.savings.costPerMonth)}.`,
+        ),
+      350,
+    );
+  }
+  function calculate() {
+    if (!form || !error || !results) return;
+    const raw: Record<string, number> = {};
+    for (const input of form.querySelectorAll<HTMLInputElement>(
+      'input[name]',
+    )) {
+      raw[input.name] = input.value === '' ? Number.NaN : input.valueAsNumber;
+      input.removeAttribute('aria-invalid');
+    }
+    const parsed = validateWorkload(raw);
+    if (parsed.kind === 'error' || !form.checkValidity()) {
+      clearTimeout(announcementTimer);
+      text(
+        'result-announcement',
+        'Estimates paused. Fix the invalid inputs to continue.',
+      );
+      for (const id of [
+        'monthly-cost',
+        'full-monthly',
+        'targeted-monthly',
+        'savings-cost',
+        'task-cost',
+        'daily-cost',
+        'input-tokens',
+        'output-tokens',
+        'task-tokens',
+        'daily-tokens',
+        'monthly-tokens',
+      ])
+        text(id, '—');
+      text('savings-percent', '');
+      for (const bar of document.querySelectorAll<HTMLElement>('.cost-bar'))
+        bar.style.width = '0%';
+      error.hidden = false;
+      error.textContent =
+        'Enter valid nonnegative numbers. Calls per task must be at least 1. Targeted context cannot exceed the whole repository. Keep each input at or below 1 billion.';
+      results.setAttribute('data-invalid', 'true');
+      for (const input of form.querySelectorAll<HTMLInputElement>(
+        'input[name]',
+      )) {
+        if (
+          !input.validity.valid ||
+          (input === target &&
+            target.valueAsNumber > (repository?.valueAsNumber ?? 0))
+        )
+          input.setAttribute('aria-invalid', 'true');
+      }
+      return;
+    }
+    error.hidden = true;
+    results.removeAttribute('data-invalid');
+    renderResult(compare(parsed.workload));
+  }
+  form?.addEventListener('input', (event) => {
+    if (!slider || !target || !repository) return;
+    if (
+      event.target === repository &&
+      Number.isFinite(repository.valueAsNumber) &&
+      repository.valueAsNumber >= 0
+    ) {
+      slider.max = repository.value;
+      target.max = repository.value;
+    }
+    if (event.target === slider) target.value = slider.value;
+    if (event.target === target && Number.isFinite(target.valueAsNumber))
+      slider.value = target.value;
+    calculate();
+  });
+  form?.addEventListener('submit', (event) => event.preventDefault());
+  form?.addEventListener('reset', () =>
+    setTimeout(() => {
+      scenario = 'targeted';
+      if (slider) {
+        slider.max = '80000';
+        slider.value = '8000';
+      }
+      if (target) target.max = '80000';
+      switches.forEach((button) =>
+        button.setAttribute(
+          'aria-pressed',
+          String(button.dataset.scenario === scenario),
+        ),
+      );
+      calculate();
+    }, 0),
+  );
+  switches.forEach((button) =>
+    button.addEventListener('click', () => {
+      scenario = button.dataset.scenario === 'full' ? 'full' : 'targeted';
+      switches.forEach((option) =>
+        option.setAttribute('aria-pressed', String(option === button)),
+      );
+      calculate();
+    }),
+  );
+  calculate();
+</script>
+<style>
+  .tool-heading {
+    padding-bottom: 35px;
+  }
+  .tool-heading h1 {
+    font-size: clamp(2rem, 4vw, 2.85rem);
+  }
+  .tool-heading .local-badge {
+    margin-top: 20px;
+  }
+  .calculator-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 55px;
+    border-top: 1px solid var(--line);
+    padding-top: 35px;
+  }
+  .calculator-grid h2 {
+    font-size: 1.3rem;
+  }
+  .calculator-grid .section-heading {
+    margin-bottom: 12px;
+  }
+  .reset-button {
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font-size: 11px;
+    text-decoration: underline;
+    padding: 5px 0;
+  }
+  .input-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 21px 20px;
+  }
+  .field > span {
+    font-size: 12px;
+    display: block;
+    margin-bottom: 7px;
+  }
+  .number-wrap {
+    position: relative;
+  }
+  .number-wrap input {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--bg);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    padding: 10px 13px 29px;
+    font-size: 17px;
+    caret-color: var(--accent);
+  }
+  .number-wrap small {
+    position: absolute;
+    bottom: 9px;
+    left: 13px;
+    font-size: 9px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .target-context {
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 20px 0 0;
+    margin: 28px 0 0;
+    min-width: 0;
+  }
+  .target-context legend {
+    font-family: var(--display);
+    font-size: 16px;
+    padding: 0 12px 0 0;
+  }
+  .target-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .target-value > div {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .target-value input {
+    width: 110px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 7px 9px;
+    font-variant-numeric: tabular-nums;
+  }
+  .target-value span {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  input[type='range'] {
+    accent-color: var(--accent);
+    width: 100%;
+    cursor: pointer;
+  }
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--muted);
+  }
+  .calculator-error {
+    color: var(--ink);
+    background: var(--paper);
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 12px;
+    margin-top: 18px;
+  }
+  [aria-invalid='true'] {
+    outline: 2px solid var(--accent);
+  }
+  .results {
+    background: var(--paper);
+    padding: 28px;
+    border-radius: 12px;
+    align-self: start;
+  }
+  .results[data-invalid] {
+    opacity: 0.45;
+  }
+  .scenario-choice {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--line);
+    margin-top: 20px;
+    padding-bottom: 15px;
+  }
+  .scenario-choice button {
+    flex: 1;
+    padding: 9px 7px;
+    border: 0;
+    background: transparent;
+    font-size: 11px;
+    color: var(--muted);
+    border-radius: 4px;
+  }
+  .scenario-choice button[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .monthly-total {
+    display: flex;
+    flex-direction: column;
+    margin-top: 23px;
+  }
+  .monthly-total > span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .monthly-total output {
+    font-family: var(--display);
+    font-size: 2.7rem;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+  .monthly-total small {
+    color: var(--muted);
+    font-size: 10px;
+  }
+  .comparison-chart {
+    margin-top: 28px;
+  }
+  .chart-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    gap: 15px;
+    margin-bottom: 7px;
+  }
+  .chart-label output {
+    font-variant-numeric: tabular-nums;
+  }
+  .cost-track {
+    height: 12px;
+    margin-bottom: 17px;
+  }
+  .cost-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cost-bar.whole {
+    opacity: 0.4;
+  }
+  .savings {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 7px;
+  }
+  .savings strong {
+    font-weight: 700;
+  }
+  .savings span {
+    font-size: 10px;
+  }
+  .result-details {
+    margin: 25px 0 0;
+  }
+  .result-details div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    border-top: 1px solid var(--line);
+    padding: 9px 0;
+    font-size: 11px;
+  }
+  .result-details dt {
+    color: var(--muted);
+  }
+  .result-details dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .results-caption {
+    font-size: 10px;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-top: 15px;
+  }
+  .calculator-method {
+    margin-top: 50px;
+  }
+  .calculator-method pre {
+    background: var(--code);
+  }
+  @media (max-width: 900px) {
+    .calculator-grid {
+      gap: 30px;
+    }
+    .results {
+      padding: 22px;
+    }
+  }
+  @media (max-width: 640px) {
+    .calculator-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      padding-top: 25px;
+    }
+    .field-grid {
+      gap: 17px 14px;
+    }
+    .results {
+      padding: 24px;
+    }
+    .tool-heading .local-badge {
+      font-size: 10px;
+    }
+    .calculator-method {
+      margin-top: 35px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cost-bar {
+      transition: none;
+    }
+  }
+</style>

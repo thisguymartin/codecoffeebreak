@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page isn't in the notebook."
+>
+  <div class="wrap">
+    <section class="page-heading page-body">
+      <h1>
+        That page went cold<span class="brand-period">.</span>
+      </h1>
+      <p>
+        There’s nothing at this address. The page may have moved, or the link
+        might have a typo.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="/">
+          Back to the notebook ↗
+        </a>
+        <a class="text-link" href="/tools">
+          Try a tool ↗
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

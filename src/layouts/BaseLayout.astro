@@ -1,0 +1,240 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import CoffeeMark from '../components/CoffeeMark.astro';
+import { site } from '../config/site';
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  article?: {
+    publishedAt: Date;
+    updatedAt?: Date;
+    author: string;
+    authorKind: 'Person' | 'Organization';
+    authorUrl?: string;
+    topics: string[];
+  };
+}
+const { title, description = site.description, image, article } = Astro.props;
+const fullTitle = title
+  ? `${title} · ${site.name}`
+  : `${site.name} · A quiet corner for developers`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = image ? new URL(image, Astro.site).href : undefined;
+const analytics = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+const schema = article
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description,
+      datePublished: article.publishedAt.toISOString(),
+      dateModified: (article.updatedAt ?? article.publishedAt).toISOString(),
+      author: {
+        '@type': article.authorKind,
+        name: article.author,
+        ...(article.authorUrl ? { url: article.authorUrl } : {}),
+      },
+      keywords: article.topics.join(', '),
+      mainEntityOfPage: canonical.href,
+      ...(imageUrl ? { image: imageUrl } : {}),
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: site.name,
+      url: site.url,
+    };
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title ?? site.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:site_name" content={site.name} />
+    <meta
+      name="twitter:card"
+      content={imageUrl ? 'summary_large_image' : 'summary'}
+    />
+    <meta name="twitter:title" content={title ?? site.name} />
+    <meta name="twitter:description" content={description} />
+    {imageUrl && (
+      <>
+        <meta property="og:image" content={imageUrl} />
+        <meta name="twitter:image" content={imageUrl} />
+      </>
+    )}
+    {article && (
+      <>
+        <meta
+          property="article:published_time"
+          content={article.publishedAt.toISOString()}
+        />
+        <meta
+          property="article:modified_time"
+          content={(article.updatedAt ?? article.publishedAt).toISOString()}
+        />
+        <meta name="author" content={article.author} />
+        {article.topics.map((topic) => (
+          <meta property="article:tag" content={topic} />
+        ))}
+      </>
+    )}
+    <meta name="theme-color" content="#211d19" />
+    <link
+      rel="icon"
+      href="/favicon.png?v=lofi"
+      type="image/png"
+      sizes="96x96"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/apple-touch-icon.png?v=lofi"
+      sizes="180x180"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={site.name}
+      href="/rss.xml"
+    />
+    <link
+      rel="preload"
+      href="/fonts/geist-regular.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem('ccb-theme');
+        document.documentElement.dataset.theme =
+          stored === 'dark' || stored === 'light'
+            ? stored
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+      } catch {
+        document.documentElement.dataset.theme = matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches
+          ? 'dark'
+          : 'light';
+      }
+    </script>
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(schema).replace(/</g, '\\u003c')}
+    ></script>
+    {analytics && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: analytics })}
+      ></script>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <header class="site-header wrap">
+      <a class="brand" href="/" aria-label="Code Coffee Break home">
+        <span class="brand-mark">
+          <CoffeeMark size={40} />
+        </span>
+        <span>Code Coffee Break</span>
+      </a>
+      <nav aria-label="Main navigation">
+        {site.navigation.map((link) => (
+          <a
+            href={link.href}
+            aria-current={
+              Astro.url.pathname.startsWith(link.href) ? 'page' : undefined
+            }
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <div class="header-actions">
+        <a
+          class="icon-button github-button"
+          href="/rss.xml"
+          aria-label="Follow Code Coffee Break via RSS"
+        >
+          <Icon name="rss" size={19} />
+        </a>
+        <button
+          class="icon-button theme-toggle"
+          id="theme-toggle"
+          aria-label="Switch color theme"
+          title="Switch color theme"
+        >
+          <Icon name="theme" size={19} />
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer wrap">
+      <div>
+        <a class="footer-brand" href="/">
+          Code Coffee Break
+        </a>
+        <p>Short reads. Useful tools. Room for another developer.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/about">About</a>
+        <a href="/contribute">Write</a>
+        <a href="/topics">Topics</a>
+        <a href="/rss.xml">
+          <Icon name="rss" size={14} /> RSS
+        </a>
+      </div>
+      <p class="footer-note">
+        © {new Date().getFullYear()} {site.name}
+        <span>Take your time. Make something good.</span>
+      </p>
+    </footer>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+      function updateThemeLabel() {
+        toggle?.setAttribute(
+          'aria-label',
+          `Switch to ${document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'} mode`,
+        );
+        const meta = document.querySelector<HTMLMetaElement>(
+          'meta[name="theme-color"]',
+        );
+        if (meta)
+          meta.content =
+            document.documentElement.dataset.theme === 'dark'
+              ? '#211d19'
+              : '#f8f3e9';
+      }
+      updateThemeLabel();
+      toggle?.addEventListener('click', () => {
+        const theme =
+          document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = theme;
+        try {
+          localStorage.setItem('ccb-theme', theme);
+        } catch {}
+        updateThemeLabel();
+      });
+    </script>
+  </body>
+</html>

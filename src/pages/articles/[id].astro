@@ -1,0 +1,96 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  publishedArticles,
+  readingTime,
+  dateLabel,
+  typeLabel,
+  topicSlug,
+} from '../../utils/content';
+export async function getStaticPaths() {
+  return (await publishedArticles()).map((article) => ({
+    params: { id: article.id },
+    props: { article },
+  }));
+}
+const { article } = Astro.props;
+const { Content, headings } = await render(article);
+const related = (await publishedArticles())
+  .filter(
+    (other) =>
+      other.id !== article.id &&
+      other.data.topics.some((topic) => article.data.topics.includes(topic)),
+  )
+  .slice(0, 2);
+---
+
+<BaseLayout
+  title={article.data.title}
+  description={article.data.description}
+  image={article.data.image}
+  article={article.data}
+>
+  <div class="wrap">
+    <header class="page-heading article-heading">
+      <div class="breadcrumb">
+        <a href="/articles">The notebook</a>
+        <span>/</span>
+        <span>{typeLabel(article.data.type)}</span>
+      </div>
+      <h1>{article.data.title}</h1>
+      <p>{article.data.description}</p>
+      <div class="article-bottom">
+        <span>{readingTime(article.body)} min read</span>
+        <time datetime={article.data.publishedAt.toISOString()}>
+          {dateLabel(article.data.publishedAt)}
+        </time>
+        <span>By {article.data.author}</span>
+        <div class="tags">
+          {article.data.topics.map((topic) => (
+            <a href={`/topics/${topicSlug(topic)}`}>{topic}</a>
+          ))}
+        </div>
+      </div>
+      {article.data.editorialNote && (
+        <p class="editorial-disclosure">{article.data.editorialNote}</p>
+      )}
+    </header>
+    <div class="article-grid page-body">
+      <div>
+        {article.data.image && (
+          <figure class="article-cover">
+            <img
+              src={article.data.image}
+              alt={article.data.imageAlt ?? ''}
+              width="1200"
+              height="800"
+              decoding="async"
+            />
+          </figure>
+        )}
+        <article class="prose">
+          <Content />
+        </article>
+        <aside class="related">
+          <h2>Related reading & tools</h2>
+          {related.map((other) => (
+            <a href={`/articles/${other.id}`}>{other.data.title} ↗</a>
+          ))}
+          <a href="/tools/ai-context-calculator">
+            AI Context Cost Calculator ↗
+          </a>
+          <a href="/projects/code-coffee-break">How this notebook is built ↗</a>
+        </aside>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <strong>In this article</strong>
+        {headings
+          .filter((heading) => heading.depth === 2)
+          .map((heading) => (
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          ))}
+      </nav>
+    </div>
+  </div>
+</BaseLayout>

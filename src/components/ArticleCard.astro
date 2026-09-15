@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { dateLabel, readingTime, topicSlug, typeLabel } from '../utils/content';
+interface Props {
+  article: CollectionEntry<'articles'>;
+  level?: 2 | 3;
+}
+const { article, level = 3 } = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
+---
+
+<article class="article-row">
+  <div class="article-row-content">
+    <div class="article-row-meta">
+      <span class="type-label">{typeLabel(article.data.type)}</span>
+      <span>·</span>
+      <span>{readingTime(article.body)} min read</span>
+      <span>·</span>
+      <time datetime={article.data.publishedAt.toISOString()}>
+        {dateLabel(article.data.publishedAt)}
+      </time>
+    </div>
+    <Heading>
+      <a href={`/articles/${article.id}`}>{article.data.title}</a>
+    </Heading>
+    <p>{article.data.description}</p>
+    <div class="article-bottom">
+      <div class="tags">
+        {article.data.topics.slice(0, 2).map((topic) => (
+          <a href={`/topics/${topicSlug(topic)}`}>{topic}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+  {article.data.image && (
+    <a
+      class="article-thumbnail"
+      href={`/articles/${article.id}`}
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <img
+        src={article.data.image}
+        alt=""
+        width="360"
+        height="240"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  )}
+</article>

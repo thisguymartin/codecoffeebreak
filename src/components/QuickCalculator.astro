@@ -1,0 +1,126 @@
+---
+import Icon from './Icon.astro';
+---
+
+<article class="quick-tool">
+  <div class="quick-tool-copy">
+    <h3>
+      <a href="/tools/ai-context-calculator">AI Context Cost Calculator</a>
+    </h3>
+    <p>
+      That repository context adds up on every call. Compare a whole repo with
+      the files you actually need.
+    </p>
+    <div class="tool-properties">
+      <span>
+        <i aria-hidden="true"></i>Browser only
+      </span>
+      <span>No data uploaded</span>
+      <span>No signup</span>
+    </div>
+    <a class="button" href="/tools/ai-context-calculator">
+      Open full calculator <Icon name="arrow" size={14} />
+    </a>
+  </div>
+  <div class="quick-controls">
+    <div class="quick-title">
+      <label for="quick-context">Targeted context / call</label>
+      <div class="quick-input">
+        <input
+          id="quick-context"
+          type="number"
+          min="0"
+          max="80000"
+          step="1"
+          value="8000"
+          required
+          aria-describedby="quick-assumption"
+        />
+        <span>tokens</span>
+      </div>
+    </div>
+    <label class="sr-only" for="quick-slider">
+      Adjust targeted context
+    </label>
+    <input
+      id="quick-slider"
+      type="range"
+      min="0"
+      max="80000"
+      step="100"
+      value="8000"
+    />
+    <div class="quick-comparison">
+      <div>
+        <span>Whole repo / month</span>
+        <output>$855.00</output>
+      </div>
+      <div>
+        <span>Targeted / month</span>
+        <output class="target-estimate" id="quick-monthly">
+          $207.00
+        </output>
+      </div>
+    </div>
+    <p id="quick-assumption" class="quick-assumption">
+      Illustrative · 80k repo · 5 calls/task · 20 tasks/day · $3/$15 per 1M
+      input/output tokens · 30 days
+    </p>
+    <p id="quick-error" class="quick-error" role="alert" hidden>
+      Enter between 0 and 80,000 tokens.
+    </p>
+    <div
+      id="quick-announcement"
+      class="sr-only"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+    <noscript>
+      <p class="quick-assumption">
+        Enable JavaScript to adjust this local example.
+      </p>
+    </noscript>
+  </div>
+</article>
+<script>
+  import { compare, exampleWorkload } from '../utils/calculator';
+  const input = document.querySelector<HTMLInputElement>('#quick-context');
+  const slider = document.querySelector<HTMLInputElement>('#quick-slider');
+  const output = document.querySelector<HTMLOutputElement>('#quick-monthly');
+  const error = document.querySelector<HTMLElement>('#quick-error');
+  const announcement = document.querySelector<HTMLElement>(
+    '#quick-announcement',
+  );
+  let timer: ReturnType<typeof setTimeout>;
+  function update() {
+    if (!input || !slider || !output || !error) return;
+    clearTimeout(timer);
+    if (!input.validity.valid || !Number.isFinite(input.valueAsNumber)) {
+      input.setAttribute('aria-invalid', 'true');
+      error.hidden = false;
+      output.value = '—';
+      if (announcement) announcement.textContent = '';
+      return;
+    }
+    input.removeAttribute('aria-invalid');
+    error.hidden = true;
+    slider.value = input.value;
+    const result = compare({
+      ...exampleWorkload,
+      targetedTokens: input.valueAsNumber,
+    });
+    output.value = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(result.targeted.costPerMonth);
+    timer = setTimeout(() => {
+      if (announcement)
+        announcement.textContent = `Targeted context estimated at ${output.value} per month in this example.`;
+    }, 300);
+  }
+  input?.addEventListener('input', update);
+  slider?.addEventListener('input', () => {
+    if (input && slider) input.value = slider.value;
+    update();
+  });
+</script>
